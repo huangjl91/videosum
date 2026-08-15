@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VideoSum 科普漫画报告</title>
+  <style>
+    :root {
+      --ink: #1a1a2e;
+      --ink2: #4a4a6a;
+      --yellow: #ffd93d;
+      --yellow-dark: #ffb800;
+      --blue: #4facfe;
+      --blue-deep: #00a8ff;
+      --red: #ff6b6b;
+      --green: #1dd1a1;
+      --purple: #a29bfe;
+      --orange: #ff9f43;
+      --pink: #ff9ff3;
+      --bg: #f0f4f8;
+      --panel: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 40px 20px;
+      background: var(--bg);
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .stage {
+      position: relative;
+      width: 840px;
+      max-width: 100%;
+    }
+
+    /* 黄色外框 */
+    .yellow-frame {
+      position: relative;
+      background: #fff;
+      border: 8px solid var(--yellow);
+      border-radius: 28px;
+      box-shadow:
+        0 24px 60px rgba(0,0,0,0.12),
+        inset 0 0 0 3px rgba(255,255,255,0.6);
+      overflow: hidden;
+      padding: 36px 34px 44px 34px;
+    }
+
+    /* 框内顶部装饰条 */
+    .frame-top-deco {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--yellow) 0px,
+        var(--yellow) 16px,
+        var(--yellow-dark) 16px,
+        var(--yellow-dark) 32px
+      );
+    }
+
+    /* 角标 */
+    .corner-badge {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: var(--ink);
+      color: var(--yellow);
+      font-size: 12px;
+      font-weight: 900;
+      padding: 6px 12px;
+      border-radius: 20px;
+      letter-spacing: 1px;
+      transform: rotate(3deg);
+      box-shadow: 4px 4px 0 var(--yellow-dark);
+    }
+
+    /* 头部 */
+    .header {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+    .header-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      box-shadow: 0 8px 20px rgba(79,172,254,0.35);
+      flex-shrink: 0;
+    }
+    .header-text h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+    }
+    .header-text p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: var(--ink2);
+      line-height: 1.5;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .tag {
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 11px;
+      border-radius: 20px;
+      color: #fff;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.15);
+    }
+    .tag-drone { background: var(--blue-deep); }
+    .tag-pop { background: var(--red); }
+    .tag-tech { background: var(--green); }
+    .tag-time { background: var(--orange); }
+
+    /* 摘要卡 */
+    .abstract-card {
+      background: linear-gradient(135deg, #fff9db 0%, #fff3bf 100%);
+      border-left: 6px solid var(--yellow-dark);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
+      position: relative;
+    }
+    .abstract-card::before {
+      content: "📋 内容提要";
+      display: inline-block;
+      background: var(--yellow);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      box-shadow: 2px 2px 0 var(--yellow-dark);
+    }
+    .abstract-card p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--ink);
+    }
+
+    /* 数据指标条 */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .metric {
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 14px 10px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      border: 2px solid transparent;
+      transition: transform .2s;
+    }
+    .metric:hover { transform: translateY(-3px); }
+    .metric:nth-child(1) { border-color: var(--blue); }
+    .metric:nth-child(2) { border-color: var(--green); }
+    .metric:nth-child(3) { border-color: var(--red); }
+    .metric:nth-child(4) { border-color: var(--purple); }
+    .metric .num {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--ink);
+      font-family: "Times New Roman", Georgia, serif;
+    }
+    .metric .label {
+      font-size: 11px;
+      color: var(--ink2);
+      margin-top: 4px;
+      font-weight: 700;
+    }
+
+    /* 分镜网格 */
+    .panels-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--ink);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .panel {
+      background: var(--panel);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      border: 3px solid var(--ink);
+      position: relative;
+    }
+    .panel:nth-child(1) { border-color: var(--blue); }
+    .panel:nth-child(2) { border-color: var(--red); }
+    .panel:nth-child(3) { border-color: var(--green); }
+    .panel:nth-child(4) { border-color: var(--purple); }
+
+    .panel-visual {
+      height: 150px;
+      background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .panel-visual svg.drone-icon { width: 90px; height: 90px; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.15)); }
+    .time-chip {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: var(--ink);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: "Times New Roman", monospace;
+    }
+    .sfx {
+      position: absolute;
+      top: -10px;
+      right: -6px;
+      background: var(--yellow);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 2px solid var(--ink);
+      transform: rotate(8deg);
+      box-shadow: 3px 3px 0 var(--ink);
+      z-index: 2;
+    }
+
+    .panel-body {
+      padding: 14px;
+    }
+    .panel-body h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+    .bubble {
+      background: #fff;
+      border: 2px solid var(--ink);
+      border-radius: 18px;
+      padding: 10px 13px;
+      margin-bottom: 10px;
+      position: relative;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.12);
+    }
+    .bubble::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 22px;
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      border-right: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      transform: rotate(45deg);
+    }
+    .bubble .who {
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--blue-deep);
+      margin-bottom: 3px;
+    }
+    .bubble .line {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .caption {
+      background: #fff9db;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--ink2);
+      border-left: 3px solid var(--yellow-dark);
+    }
+
+    /* 时间轴 */
+    .timeline {
+      margin-top: 24px;
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+    .timeline h3 {
+      margin: 0 0 14px;
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+    .track {
+      position: relative;
+      height: 8px;
+      background: #e9ecef;
+      border-radius: 4px;
+      margin-bottom: 18px;
+    }
+    .track-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--blue), var(--purple), var(--red), var(--green));
+    }
+    .timeline-points {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      top: -22px;
+    }
+    .t-point {
+      text-align: center;
+      width: 42px;
+    }
+    .t-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid var(--ink);
+      margin: 0 auto 6px;
+      box-shadow: 0 0 0 3px var(--yellow);
+    }
+    .t-point span {
+      font-size: 10px;
+      font-weight: 900;
+      color: var(--ink);
+      font-family: "Times New Roman", serif;
+    }
+
+    /* 底部信息 */
+    .footer {
+      margin-top: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--ink2);
+      border-top: 1px dashed #cbd5e0;
+      padding-top: 14px;
+    }
+    .footer .badges {
+      display: flex;
+      gap: 8px;
+    }
+    .footer .pill {
+      background: var(--ink);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 800;
+    }
+
+    /* 左下角机器人（压出框外） */
+    .bot-anchor {
+      position: absolute;
+      bottom: -34px;
+      left: 26px;
+      width: 110px;
+      height: 110px;
+      z-index: 5;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.18));
+    }
+
+    /* 全宽面板在窄屏下 */
+    @media (max-width: 720px) {
+      .panels { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .header h1 { font-size: 24px; }
+      .yellow-frame { padding: 28px 22px 40px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="yellow-frame">
+      <div class="frame-top-deco"></div>
+      <div class="corner-badge">VOL.01</div>
+
+      <!-- 头部 -->
+      <div class="header">
+        <div class="header-icon">🚁</div>
+        <div class="header-text">
+          <h1>无人机动力系统探秘</h1>
+          <p>视频来源：《四旋翼无人机是如何飞起来的？》· 视频作者：科普频道「宇宙视觉」<br>
+             本报告基于原视频关键帧与语音内容自动生成，以漫画分镜方式拆解核心科学原理。</p>
+          <div class="tags">
+            <span class="tag tag-drone">无人机</span>
+            <span class="tag tag-pop">科普漫画</span>
+            <span class="tag tag-tech">空气动力学</span>
+            <span class="tag tag-time">时长 08:32</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 摘要 -->
+      <div class="abstract-card">
+        <p>
+          无人机能在空中稳定悬停、前飞、转弯，核心在于「四个螺旋桨的默契配合」。本视频通过高速摄影与三维动画，
+          展示了无刷电机如何驱动螺旋桨产生升力、飞控系统如何通过调节四个电机的转速差来控制俯仰、横滚与偏航，
+          并解释了桨叶角速度、拉力公式 <strong>T = C<sub>T</sub> · ρ · n² · D⁴</strong> 与电池放电曲线对续航的影响。
+          下面用 4 个漫画分镜，把 8 分钟的知识浓缩成一看就懂的图文报告。
+        </p>
+      </div>
+
+      <!-- 数据指标 -->
+      <div class="metrics">
+        <div class="metric">
+          <div class="num">512 s</div>
+          <div class="label">视频总时长</div>
+        </div>
+        <div class="metric">
+          <div class="num">1920×1080</div>
+          <div class="label">画面分辨率</div>
+        </div>
+        <div class="metric">
+          <div class="num">30 fps</div>
+          <div class="label">视频帧率</div>
+        </div>
+        <div class="metric">
+          <div class="num">8</div>
+          <div class="label">关键帧数</div>
+        </div>
+      </div>
+
+      <!-- 分镜 -->
+      <div class="panels-title">🎬 漫画分镜解读</div>
+      <div class="panels">
+        <!-- 分镜 1 -->
+        <div class="panel">
+          <div class="sfx">嗡嗡嗡～</div>
+          <div class="panel-visual" style="background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);">
+            <svg class="drone-icon" viewBox="0 0 100 100">
+              <line x1="35" y1="45" x2="15" y2="28" stroke="#1a1a2e" stroke-width="3"/>
+              <line x1="65" y1="45" x2="85" y2="28" stroke="#1a1a2e" stroke-width="3"/>
+              <line x1="35" y1="45" x2="15" y2="62" stroke="#1a1a2e" stroke-width="3"/>
+              <line x1="65" y1="45" x2="85" y2="62" stroke="#1a1a2e" stroke-width="3"/>
+              <ellipse cx="14" cy="27" rx="13" ry="4" fill="#4facfe" stroke="#1a1a2e" stroke-width="2.5"/>
+              <ellipse cx="86" cy="27" rx="13" ry="4" fill="#4facfe" stroke="#1a1a2e" stroke-width="2.5"/>
+              <ellipse cx="14" cy="63" rx="13" ry="4" fill="#4facfe" stroke="#1a1a2e" stroke-width="2.5"/>
+              <ellipse cx="86" cy="63" rx="13" ry="4" fill="#4facfe" stroke="#1a1a2e" stroke-width="2.5"/>
+              <rect x="38" y="40" width="24" height="14" rx="6" fill="#ffd93d" stroke="#1a1a2e" stroke-width="2.5"/>
+              <circle cx="50" cy="47" r="4" fill="#ff6b6b"/>
+            </svg>
+            <div class="time-chip">00:12</div>
+          </div>
+          <div class="panel-body">
+            <h3>01 · 四旋翼的基本结构</h3>
+            <div class="bubble">
+              <div class="who">讲解员小星</div>
+              <div class="line">大家好！一架常见的四旋翼无人机，其实只有 4 个电机 + 4 片桨 + 1 个飞控板。</div>
+            </div>
+            <div class="caption">
+              机臂呈「X」或「十」字布局。对角两个桨顺时针转，另一对角逆时针转，这样旋转产生的反扭矩才能相互抵消，机身不会原地打转。
+            </div>
+          </div>
+        </div>
+
+        <!-- 分镜 2 -->
+        <div class="panel">
+          <div class="sfx">呼——</div>
+          <div class="panel-visual" style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);">
+            <svg class="drone-icon" viewBox="0 0 100 100">
+              <defs>
+                <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+                  <polygon points="0 0, 8 3.5, 0 7" fill="#ff6b6b"/>
+                </marker>
+              </defs>
+              <rect x="38" y="38" width="24" height="18" rx="7" fill="#ffd93d" stroke="#1a1a2e" stroke-width="2.5"/>
+              <ellipse cx="50" cy="62" rx="22" ry="8" fill="none" stroke="#ff6b6b" stroke-width="2.5" stroke-dasharray="4 2"/>
+              <line x1="50" y1="20" x2="50" y2="34" stroke="#ff6b6b" stroke-width="3" marker-end="url(#arr)"/>
+              <text x="55" y="26" font-size="12" fill="#ff6b6b" font-weight="900">升力 T</text>
+            </svg>
+            <div class="time-chip">01:45</div>
+          </div>
+          <div class="panel-body">
+            <h3>02 · 升力从哪来？</h3>
+            <div class="bubble">
+              <div class="who">讲解员小星</div>
+              <div class="line">螺旋桨把空气「向下推」，空气反作用力就把飞机「向上顶」。</div>
+            </div>
+            <div class="caption">
+              转速越快、桨径越大，升力越大。定量关系可用拉力公式 <strong>T = C<sub>T</sub>ρn²D⁴</strong> 描述：
+              n 是转速，D 是桨径，C<sub>T</sub> 是拉力系数，与桨叶形状有关。
+            </div>
+          </div>
+        </div>
+
+        <!-- 分镜 3 -->
+        <div class="panel">
+          <div class="sfx">嗖！</div>
+          <div class="panel-visual" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
+            <svg class="drone-icon" viewBox="0 0 100 100">
+              <rect x="38" y="42" width="24" height="14" rx="6" fill="#ffd93d" stroke="#1a1a2e" stroke-width="2.5"/>
+              <ellipse cx="25" cy="40" rx="10" ry="5" fill="#1dd1a1" opacity="0.35" transform="rotate(-15 25 40)"/>
+              <ellipse cx="75" cy="55" rx="10" ry="5" fill="#ff6b6b" opacity="0.35" transform="rotate(15 75 55)"/>
+              <text x="12" y="35" font-size="10" fill="#1dd1a1" font-weight="900">加速</text>
+              <text x="68" y="72" font-size="10" fill="#ff6b6b" font-weight="900">减速</text>
+              <path d="M45 36 Q30 25 20 32" fill="none" stroke="#1dd1a1" stroke-width="2"/>
+              <path d="M55 62 Q70 73 80 66" fill="none" stroke="#ff6b6b" stroke-width="2"/>
+            </svg>
+            <div class="time-chip">03:28</div>
+          </div>
+          <div class="panel-body">
+            <h3>03 · 姿态控制的秘密</h3>
+            <div class="bubble">
+              <div class="who">讲解员小星</div>
+              <div class="line">想让无人机往前倾？把前面的电机减速，后面的电机加速！</div>
+            </div>
+            <div class="caption">
+              俯仰、横滚、偏航都靠四个电机的「转速差」实现。飞控每秒读取陀螺仪、加速度计数百次，实时算出每个电机该加速还是减速。
+            </div>
+          </div>
+        </div>
+
+        <!-- 分镜 4 -->
+        <div class="panel">
+          <div class="sfx">哔！电量低</div>
+          <div class="panel-visual" style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);">
+            <svg class="drone-icon" viewBox="0 0 100 100">
+              <rect x="28" y="55" width="44" height="22" rx="4" fill="#fff" stroke="#1a1a2e" stroke-width="2.5"/>
+              <rect x="72" y="62" width="6" height="8" rx="1" fill="#1a1a2e"/>
+              <rect x="31" y="58" width="32" height="16" rx="2" fill="#1dd1a1"/>
+              <path d="M45 48 L50 35 L55 48" fill="#ffd93d" stroke="#1a1a2e" stroke-width="2"/>
+              <rect x="47" y="46" width="6" height="12" fill="#ffd93d" stroke="#1a1a2e" stroke-width="2"/>
+            </svg>
+            <div class="time-chip">06:10</div>
+          </div>
+          <div class="panel-body">
+            <h3>04 · 动力与续航的博弈</h3>
+            <div class="bubble">
+              <div class="who">讲解员小星</div>
+              <div class="line">电池就像无人机的「油箱」，容量大则重，重量轻则飞不远。</div>
+            </div>
+            <div class="caption">
+              锂聚合物电池（LiPo）放电倍率用「C」表示。高 C 数能瞬时输出大电流，满足急加速；但能量密度有限，
+              典型消费级无人机续航约 20–30 分钟，工业级可通过油电混动或氢燃料电池突破。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 时间轴 -->
+      <div class="timeline">
+        <h3>⏱ 关键帧时间轴</h3>
+        <div class="track"><div class="track-fill"></div></div>
+        <div class="timeline-points">
+          <div class="t-point"><div class="t-dot"></div><span>00:00</span></div>
+          <div class="t-point"><div class="t-dot"></div><span>00:12</span></div>
+          <div class="t-point"><div class="t-dot"></div><span>01:45</span></div>
+          <div class="t-point"><div class="t-dot"></div><span>03:28</span></div>
+          <div class="t-point"><div class="t-dot"></div><span>06:10</span></div>
+          <div class="t-point"><div class="t-dot"></div><span>08:32</span></div>
+        </div>
+      </div>
+
+      <!-- 底部 -->
+      <div class="footer">
+        <div class="badges">
+          <span class="pill">#科普漫画</span>
+          <span class="pill">#无人机</span>
+          <span class="pill">#空气动力学</span>
+        </div>
+        <div>VideoSum 自动生成 · 共 4 个分镜 · 基于真实视频关键帧</div>
+      </div>
+    </div>
+
+    <!-- 左下角小机器人 -->
+    <svg class="bot-anchor" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <!-- 身体 -->
+      <rect x="42" y="74" width="36" height="32" rx="12" fill="#ffd93d" stroke="#1a1a2e" stroke-width="3"/>
+      <!-- 胸口标志 -->
+      <rect x="55" y="82" width="10" height="12" rx="2" fill="#ff6b6b" stroke="#1a1a2e" stroke-width="2"/>
+      <!-- 手臂 -->
+      <path d="M40 86 Q24 80 22 68" fill="none" stroke="#1a1a2e" stroke-width="5" stroke-linecap="round"/>
+      <path d="M80 86 Q96 80 98 68" fill="none" stroke="#1a1a2e" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="20" cy="66" r="5" fill="#4facfe" stroke="#1a1a2e" stroke-width="2"/>
+      <circle cx="100" cy="66" r="5" fill="#4facfe" stroke="#1a1a2e" stroke-width="2"/>
+      <!-- 轮子/腿 -->
+      <circle cx="48" cy="112" r="10" fill="#4a4a6a" stroke="#1a1a2e" stroke-width="3"/>
+      <circle cx="72" cy="112" r="10" fill="#4a4a6a" stroke="#1a1a2e" stroke-width="3"/>
+      <circle cx="48" cy="112" r="4" fill="#a29bfe"/>
+      <circle cx="72" cy="112" r="4" fill="#a29bfe"/>
+      <!-- 脖子 -->
+      <rect x="54" y="64" width="12" height="12" fill="#4a4a6a" stroke="#1a1a2e" stroke-width="2"/>
+      <!-- 头 -->
+      <rect x="34" y="22" width="52" height="46" rx="14" fill="#ffd93d" stroke="#1a1a2e" stroke-width="3"/>
+      <!-- 屏幕脸 -->
+      <rect x="40" y="28" width="40" height="30" rx="8" fill="#1a1a2e"/>
+      <!-- 眼睛 -->
+      <circle cx="50" cy="40" r="5" fill="#4facfe"/>
+      <circle cx="70" cy="40" r="5" fill="#4facfe"/>
+      <!-- 高光 -->
+      <circle cx="52" cy="38" r="1.5" fill="#fff"/>
+      <circle cx="72" cy="38" r="1.5" fill="#fff"/>
+      <!-- 天线 -->
+      <line x1="44" y1="22" x2="38" y2="8" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round"/>
+      <line x1="76" y1="22" x2="82" y2="8" stroke="#1a1a2e" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="38" cy="8" r="4" fill="#ff6b6b" stroke="#1a1a2e" stroke-width="2"/>
+      <circle cx="82" cy="8" r="4" fill="#4facfe" stroke="#1a1a2e" stroke-width="2"/>
+    </svg>
+  </div>
+</body>
+</html>

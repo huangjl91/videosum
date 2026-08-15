@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #1A73E8;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: #F7F8FC;
+  color: #0A0A0B;
+  font-family: 'Noto Sans SC', system-ui, 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 自定义滚动条，贴近设计稿的浅色控制台风格 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #d4d8e0; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #c2c7d0; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* 进入动画 */
+@keyframes vs-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.vs-fade { animation: vs-fade-in .25s ease both; }
+
+/* 处理中：进度条流动 */
+@keyframes vs-stripes {
+  from { background-position: 0 0; }
+  to { background-position: 28px 0; }
+}
+.vs-stripes {
+  background-image: linear-gradient(45deg, rgba(255,255,255,.25) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.25) 50%, rgba(255,255,255,.25) 75%, transparent 75%, transparent);
+  background-size: 28px 28px;
+  animation: vs-stripes .6s linear infinite;
+}

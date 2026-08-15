@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build output (frontend)
+dist/
+
+# Build output (backend, compiled from server/*.ts)
+build-server/
+
+# Electron-builder output (contains the installer EXE and unpacked app — DO NOT commit)
+# The installer is distributed via GitHub Releases, not the repo.
+release/
+
+# electron-builder debug artifacts
+builder-debug.yml
+builder-effective-config.yaml
+
+# Generated vite config temp files
+vite.config.ts.timestamp-*.mjs
+vite.config.js
+vite.config.d.ts
+
+# TypeScript declaration emit from server compile
+server/**/*.d.ts
+server/**/*.js
+
+# Runtime user data (reports, settings, uploaded videos)
+data/
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# WorkBuddy / agent internal
+.workbuddy/
+
+# Keep the icon source used by electron-builder
+!build/icon.png
+!build/icon.ico
