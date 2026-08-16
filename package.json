@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "main": "electron/main.cjs",
+  "description": "把视频一键转换成「通用摘要 / 漫画分镜 / 论文报告」三种形式，支持关键帧时间轴跳转与本地存储，基于多模态 AI 视觉模型。",
+  "author": "VideoSum",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
@@ -10,7 +12,7 @@
     "preview": "vite preview",
     "electron:dev": "node electron/run.cjs",
     "dev:build": "npm run build && npm run build:server && electron-builder --dir --config",
-    "pack": "npm run build && npm run build:server && electron-builder --win --config"
+    "pack": "npm run build && npm run build:server && electron-builder --win --config --publish=never"
   },
   "dependencies": {
     "cors": "^2.8.6",
